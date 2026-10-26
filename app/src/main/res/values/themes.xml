@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.E3Navigator" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#0B5CAD</item>
+        <item name="colorAccent">#0B5CAD</item>
+    </style>
+</resources>

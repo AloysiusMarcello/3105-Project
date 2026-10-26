@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Maps-style navigation screen: instruction banner on top, route map, ETA bar at the bottom.
+     Testing tools live in a slide-up panel (tune button on the right). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F1F3F4"
+    android:keepScreenOn="true">
+
+    <com.example.e3navigator.ui.RouteMapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
+    <!-- ===== Instruction banner + floating buttons ===== -->
+    <LinearLayout
+        android:id="@+id/bannerGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_banner"
+            android:elevation="6dp"
+            android:gravity="center_vertical"
+            android:minHeight="104dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="14dp">
+
+            <com.example.e3navigator.ui.ManeuverView
+                android:id="@+id/maneuverIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/distanceText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/titleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:text="E3 Navigator"
+                    android:textColor="#FFFFFF"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/subtitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="2"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/thenChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_then"
+            android:elevation="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Then"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.example.e3navigator.ui.ManeuverView
+                android:id="@+id/thenIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/repeatButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_round_white"
+                android:contentDescription="Repeat the current instruction"
+                android:elevation="4dp"
+                android:src="@drawable/ic_volume" />
+
+            <ImageButton
+                android:id="@+id/overviewButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_round_white"
+                android:contentDescription="Toggle route overview"
+                android:elevation="4dp"
+                android:src="@drawable/ic_overview" />
+
+            <ImageButton
+                android:id="@+id/toolsButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_round_white"
+                android:contentDescription="Testing tools"
+                android:elevation="4dp"
+                android:src="@drawable/ic_tune" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ===== Small camera preview (for sighted testers) ===== -->
+    <FrameLayout
+        android:id="@+id/cameraCard"
+        android:layout_width="84dp"
+        android:layout_height="150dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="124dp"
+        android:background="@drawable/bg_camera"
+        android:elevation="4dp"
+        android:padding="2dp">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no" />
+    </FrameLayout>
+
+    <!-- Last spoken cue -->
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginStart="108dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="124dp"
+        android:background="@drawable/bg_cue"
+        android:elevation="4dp"
+        android:importantForAccessibility="no"
+        android:maxLines="4"
+        android:paddingStart="14dp"
+        android:paddingTop="9dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="9dp"
+        android:text="Ready"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+
+    <!-- ===== Bottom ETA bar ===== -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_bottom_bar"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
+        android:minHeight="108dp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp">
+
+        <ImageButton
+            android:id="@+id/stopButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_close"
+            android:contentDescription="Stop navigation"
+            android:src="@drawable/ic_close_red"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/etaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#188038"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/etaDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#5F6368"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/continueButton"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_pill_blue"
+            android:contentDescription="Continue to the next destination. You can also press volume up."
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="Continue"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- ===== Touch shield: while the phone is worn the screen faces the user's chest, so all
+         touches are ignored (the lanyard or body must not press anything). Hold 3 s to unlock for testers. ===== -->
+    <View
+        android:id="@+id/touchShield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:contentDescription="Screen locked during navigation. Use the volume buttons."
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <!-- ===== Start screen: the whole screen is the Start button ===== -->
+    <LinearLayout
+        android:id="@+id/startOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F2202124"
+        android:clickable="true"
+        android:contentDescription="Start navigation. You can also press the volume up button."
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <TextView
+            android:id="@+id/startTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:text="Tap anywhere\nto start"
+            android:textColor="#FFFFFF"
+            android:textSize="44sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:text="or press VOLUME UP\n\nVolume up: start · continue · repeat\nHold volume up: louder\nVolume down: where am I?\nHold volume down 2 s: stop"
+            android:textColor="#E8EAED"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/overlayToolsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Testing tools, for sighted testers"
+            android:text="Testing tools"
+            android:textAllCaps="false"
+            android:textColor="#9AA0A6"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- ===== Testing tools panel (slides over the map) ===== -->
+    <ScrollView
+        android:id="@+id/toolsPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="72dp"
+        android:background="@drawable/bg_panel"
+        android:elevation="16dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Testing tools"
+                    android:textColor="#202124"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/closeToolsButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_close"
+                    android:contentDescription="Close testing tools"
+                    android:src="@drawable/ic_close" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/debugText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#F1F3F4"
+                android:fontFamily="monospace"
+                android:padding="10dp"
+                android:textColor="#202124"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/routeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="#5F6368"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Calibration and survey"
+                android:textColor="#202124"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Measured walk (m)" />
+
+                <EditText
+                    android:id="@+id/calibDistance"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="10" />
+
+                <Button
+                    android:id="@+id/calibButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calibrate step"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Distance to plate (m)" />
+
+                <EditText
+                    android:id="@+id/plateDistance"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="2.0" />
+
+                <Button
+                    android:id="@+id/plateCalibButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calibrate plate"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/markButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Survey mark"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/resetStepsButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Reset counter"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/shareButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Share log"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/diagButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Sensor diagnostic"
+                android:textAllCaps="false" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Settings"
+                android:textColor="#202124"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Step length (m)" />
+
+                <EditText
+                    android:id="@+id/stepLength"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Assumed sighting distance (m)" />
+
+                <EditText
+                    android:id="@+id/sightingDistance"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Plate size calibration (0 = off)" />
+
+                <EditText
+                    android:id="@+id/plateCalib"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Max uncertainty before LOST (m)" />
+
+                <EditText
+                    android:id="@+id/maxSigma"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Drift (fraction of distance)" />
+
+                <EditText
+                    android:id="@+id/drift"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Minimum volume at start (% of max, 0 = don't change)" />
+
+                <EditText
+                    android:id="@+id/guidanceVolume"
+                    android:layout_width="110dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/volumeDownButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Volume −"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/volumeUpButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Volume +"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/dimCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dim screen while navigating (turn off for demos)" />
+
+            <CheckBox
+                android:id="@+id/adaptiveStepCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Adaptive step length (shorter steps in crowds; needs a calibration walk)" />
+
+            <CheckBox
+                android:id="@+id/hardwareStepCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prefer Android's step detector (default: the app's own; it switches automatically if the active one goes silent)" />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Save settings"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
