@@ -1,0 +1,20 @@
+# Render Blueprint: publishes the browser version (web/) as a static site.
+# No database and no server process: the app runs entirely in the phone's browser,
+# and settings/logs stay in each phone's browser storage.
+services:
+  - type: web
+    runtime: static
+    name: e3-navigator
+    buildCommand: echo "No build step"
+    staticPublishPath: ./web
+    autoDeployTrigger: commit
+    # Only redeploy when the web app changes, not the Android code.
+    buildFilter:
+      paths:
+        - web/**
+        - render.yaml
+    headers:
+      # Revalidate on every load so phones pick up a new deploy straight away.
+      - path: /*
+        name: Cache-Control
+        value: no-cache

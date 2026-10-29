@@ -8,3 +8,7 @@
 /captures/
 .externalNativeBuild/
 .cxx/
+
+# Web app: self-signed dev certificate (contains a private key)
+/web/.cert/
+/web/node_modules/

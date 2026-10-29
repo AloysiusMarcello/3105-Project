@@ -1,0 +1,72 @@
+{
+  "_note": "Built from the 19 Oct route video. Shape, turn directions, door sides and sign choices come from the video. LENGTHS ARE VIDEO-TIMING ESTIMATES (~1.2 m/s, roughly +/-25%): tape-measure S1, S2, S3 and replace. Fields starting with _ are ignored.",
+  "routeId": "E3_ROUTE_01",
+  "name": "Cheers to E3-06-02, toilet and back",
+  "segments": [
+    {
+      "id": "S1",
+      "_video": "0:00-0:21. Start with your back to Cheers, facing down the main corridor. E3-06-02 has two doors on the LEFT, both plated 'Tutorial Room (E3-06-02)'. Plates sit in door recesses and can only be read when facing the door.",
+      "from": "Cheers",
+      "to": "E3-06-02",
+      "lengthM": 18.0,
+      "endAction": "ARRIVE",
+      "arrivalSide": "LEFT",
+      "startInstruction": "With your back to Cheers, walk straight ahead down the main corridor.",
+      "arrivalMessage": "You are at the door of tutorial room E3-06-02.",
+      "landmarks": [
+        { "id": "L1", "text": "E3-06-02", "positionM": 18.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
+      ]
+    },
+    {
+      "id": "S2",
+      "_video": "0:21-1:11. ~8 m to the second E3-06-02 door, then a long corridor with no forward-facing signs until the EXIT sign above the double doors at the end. Turn LEFT at the end (the lift lobby is to the right).",
+      "from": "E3-06-02",
+      "to": "the end of the corridor",
+      "lengthM": 55.0,
+      "endAction": "TURN_LEFT",
+      "startTurn": "RIGHT",
+      "startInstruction": "Turn right to face along the corridor, then walk straight. This is a long corridor.",
+      "maxSigmaM": 7.0,
+      "landmarks": [
+        { "_note": "ceiling EXIT sign above the double doors at the corridor end, facing you as you walk",
+          "id": "L2", "text": "EXIT", "positionM": 55.0, "sightingDistanceM": 4.0 }
+      ]
+    },
+    {
+      "id": "S3",
+      "_video": "1:11-1:37. Past the Active Learning Room (E3-06-07) at the corner, into the narrow open-air walkway (tiled floor). Male toilet door is on the LEFT; it has a pictogram only, no text, so arrival is by step count.",
+      "from": "the end of the corridor",
+      "to": "the male toilet",
+      "lengthM": 16.0,
+      "endAction": "ARRIVE",
+      "arrivalSide": "LEFT",
+      "startInstruction": "Walk straight along the narrow walkway. The toilet is on your left near the end.",
+      "arrivalMessage": "You have arrived at the male toilet. The door is on your left."
+    },
+    {
+      "id": "S4",
+      "_video": "1:39-1:54. Back along the walkway; turn RIGHT into the main corridor.",
+      "from": "the male toilet",
+      "to": "the main corridor",
+      "lengthM": 16.0,
+      "endAction": "TURN_RIGHT",
+      "startTurn": "AROUND",
+      "startInstruction": "Turn around, then walk straight back along the walkway."
+    },
+    {
+      "id": "S5",
+      "_video": "1:55-2:39. Long corridor back towards Cheers (the Cheers sign is visible far ahead). First E3-06-02 door met is on the RIGHT.",
+      "from": "the main corridor",
+      "to": "E3-06-02",
+      "lengthM": 47.0,
+      "endAction": "ARRIVE",
+      "arrivalSide": "RIGHT",
+      "startInstruction": "Walk straight back along the long corridor towards E3-06-02.",
+      "arrivalMessage": "You are back at tutorial room E3-06-02.",
+      "maxSigmaM": 7.0,
+      "landmarks": [
+        { "id": "L3", "text": "E3-06-02", "positionM": 47.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
+      ]
+    }
+  ]
+}

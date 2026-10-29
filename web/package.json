@@ -1,0 +1,15 @@
+{
+  "name": "e3-navigator-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser version of the E3 Navigator (IE3105 G03 Concept C) prototype",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "start:https": "node server.mjs --https",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

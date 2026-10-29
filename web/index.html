@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#188038">
+  <meta name="description" content="E3 Navigator: hybrid visual-inertial indoor navigation prototype (IE3105 G03 Concept C)">
+  <title>E3 Navigator</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+<main id="app">
+  <canvas id="map" aria-hidden="true"></canvas>
+
+  <div class="banner-group">
+    <div id="banner" class="banner" role="img" aria-label="Ready">
+      <div id="maneuverIcon" class="maneuver"></div>
+      <div class="banner-text">
+        <div id="distanceText" class="distance" hidden></div>
+        <div id="titleText" class="title">E3 Navigator</div>
+        <div id="subtitleText" class="subtitle" hidden></div>
+      </div>
+    </div>
+    <div id="thenChip" class="then" hidden>Then <span id="thenIcon" class="maneuver small"></span></div>
+    <div id="simPad" class="sim-pad" hidden aria-label="Simulator">
+      <button type="button" data-sim="step" title="One step (↑)">Step</button>
+      <button type="button" data-sim="walk" id="simWalkButton" title="Walk automatically (G)">Walk</button>
+      <button type="button" data-sim="left" title="Turn left (←)">⟲ L</button>
+      <button type="button" data-sim="right" title="Turn right (→)">R ⟳</button>
+      <button type="button" data-sim="around" title="Turn around (T)">↻ 180</button>
+      <select id="simSign" aria-label="Show a sign to the camera"><option value="">Sign…</option></select>
+    </div>
+  </div>
+
+  <div class="side-buttons">
+    <button id="repeatButton" class="round" type="button" aria-label="Repeat instruction">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18 6.3a8 8 0 0 1 0 11.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button id="overviewButton" class="round" type="button" aria-label="Toggle whole-route overview">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V9.5a3.5 3.5 0 0 1 3.5-3.5H18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="19" r="2.2" fill="currentColor"/><path d="M15.5 3.5 18.5 6l-3 2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="toolsButton" class="round" type="button" aria-label="Testing tools">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M4 12h5M13 12h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="15" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+  </div>
+
+  <div class="camera-card" aria-hidden="true">
+    <video id="preview" playsinline muted autoplay></video>
+    <span id="cameraLabel">Camera off</span>
+  </div>
+  <div id="statusText" class="cue">Ready</div>
+
+  <div class="bottom-bar">
+    <button id="stopButton" class="close" type="button" aria-label="Stop navigation" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+    <div class="eta">
+      <div id="etaText" class="eta-time"></div>
+      <div id="etaDetail" class="eta-detail"></div>
+    </div>
+    <button id="continueButton" class="pill" type="button" hidden>Continue</button>
+  </div>
+
+  <div id="touchShield" class="shield" hidden>
+    <div class="shield-hint">Screen locked during navigation.<br>Double-tap: main button · Hold 3 s: unlock</div>
+  </div>
+
+  <div id="startOverlay" class="overlay" role="button" tabindex="0">
+    <div id="startTitle" class="overlay-title">Tap anywhere<br>to begin</div>
+    <div id="startHelp" class="overlay-help"></div>
+    <div id="startWarning" class="overlay-warning" hidden></div>
+    <button id="overlayToolsButton" class="link" type="button">Testing tools</button>
+  </div>
+
+  <section id="toolsPanel" class="panel" hidden aria-label="Testing tools">
+    <div class="panel-head">
+      <h2>Testing tools</h2>
+      <button id="closeToolsButton" class="close" type="button" aria-label="Close testing tools">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <pre id="debugText" class="debug"></pre>
+    <div id="routeText" class="note"></div>
+
+    <h3>Simulator</h3>
+    <label class="check"><input type="checkbox" id="simCheck"> Simulate walking (for laptops: ignores the motion sensors)</label>
+    <p class="note">Keys: ↑ step · G walk · ← → turn · T turn around · 1–9 show sign · Space/Enter main button · W where am I · Esc stop</p>
+
+    <h3>Calibration and survey</h3>
+    <div class="row"><label for="calibDistance">Measured walk (m)</label><input id="calibDistance" type="number" step="0.1" value="10" inputmode="decimal"><button id="calibButton" type="button">Calibrate step</button></div>
+    <div class="row"><label for="plateDistance">Distance to plate (m)</label><input id="plateDistance" type="number" step="0.1" value="2.0" inputmode="decimal"><button id="plateCalibButton" type="button">Calibrate plate</button></div>
+    <div class="row buttons"><button id="markButton" type="button">Survey mark</button><button id="resetStepsButton" type="button">Reset counter</button><button id="diagButton" type="button">Sensor diagnostic</button></div>
+
+    <h3>Logs</h3>
+    <div class="row buttons"><button id="shareButton" type="button">Share current log</button></div>
+    <div class="row"><select id="logSelect" aria-label="Earlier logs"></select><button id="downloadLogButton" type="button">Download</button></div>
+
+    <h3>Route</h3>
+    <div class="row buttons">
+      <label class="filebutton">Load route.json<input id="routeFile" type="file" accept=".json,application/json"></label>
+      <button id="builtInRouteButton" type="button">Use built-in route</button>
+    </div>
+
+    <h3>Settings</h3>
+    <div class="row"><label for="stepLength">Step length (m)</label><input id="stepLength" type="number" step="0.001" inputmode="decimal"></div>
+    <div class="row"><label for="sightingDistance">Assumed sighting distance (m)</label><input id="sightingDistance" type="number" step="0.1" inputmode="decimal"></div>
+    <div class="row"><label for="plateCalib">Plate size calibration (0 = off)</label><input id="plateCalib" type="number" step="0.0001" inputmode="decimal"></div>
+    <div class="row"><label for="maxSigma">Max uncertainty before LOST (m)</label><input id="maxSigma" type="number" step="0.1" inputmode="decimal"></div>
+    <div class="row"><label for="drift">Drift (fraction of distance)</label><input id="drift" type="number" step="0.01" inputmode="decimal"></div>
+    <div class="row"><label for="speechRate">Speech rate (1 = normal)</label><input id="speechRate" type="number" step="0.1" min="0.5" max="2" inputmode="decimal"></div>
+    <div class="row"><label for="ocrEngine">Sign reading (OCR)</label>
+      <select id="ocrEngine">
+        <option value="auto">Auto: built-in if available, else Tesseract</option>
+        <option value="tesseract">Tesseract.js</option>
+        <option value="off">Off (camera preview only)</option>
+      </select>
+    </div>
+    <label class="check"><input type="checkbox" id="dimCheck"> Black out the screen while navigating (turn off for demos)</label>
+    <label class="check"><input type="checkbox" id="doubleTapCheck"> Double-tap the locked screen = main button (no headset or remote)</label>
+    <label class="check"><input type="checkbox" id="adaptiveStepCheck"> Adaptive step length (shorter steps in crowds; needs a calibration walk)</label>
+    <div class="row buttons"><button id="saveButton" class="primary" type="button">Save settings</button></div>
+  </section>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+</main>
+</body>
+</html>
