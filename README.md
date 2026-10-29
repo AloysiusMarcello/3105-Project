@@ -10,7 +10,7 @@ A native Android app (Kotlin) for hybrid visual-inertial navigation along the pr
 
 Everything runs offline on the phone. Camera frames are processed in memory and never stored.
 
-> 🌐 **Browser version:** the same navigator also runs in a phone's web browser, with no install and a laptop simulator for testing. See [`web/README.md`](web/README.md).
+> 🌐 **Browser version:** the same navigator also runs in a phone's web browser, with no install and a laptop simulator for testing. Live at **https://e3-navigator.onrender.com** ([simulator](https://e3-navigator.onrender.com/?sim)). See [`web/README.md`](web/README.md).
 
 > ⚠️ **The route distances and landmarks in `app/src/main/assets/routes/e3_route.json` are placeholders** (20 m → right turn → 12 m → E3-06-02 → 15 m → toilet). Replace them with your survey (Step 4 below) before any route test.
 

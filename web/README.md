@@ -4,6 +4,8 @@ The same hybrid visual-inertial navigator as the Android app (route **Cheers →
 
 The navigation logic (`NavigationEngine`, turn and step detectors, landmark matcher, guidance) is a line-by-line JavaScript port of the Kotlin `core/` package, with the same thresholds, wording and unit tests. The browser layer replaces the Android APIs: motion sensors, camera with on-device OCR, speech, vibration and logging.
 
+**Live:** https://e3-navigator.onrender.com (open it on the phone), or https://e3-navigator.onrender.com/?sim for the laptop simulator. No setup needed; the sections below are for running your own copy.
+
 Requirements: **Node.js 20+** on the laptop (only to serve the files and run the tests; there are no npm packages to install).
 
 ---
@@ -50,13 +52,15 @@ It prints an address like `https://192.168.1.23:8443`. With the phone on the **s
 
 The certificate is created in `web/.cert/` (git-ignored, never served) and remade automatically if the laptop's IP changes.
 
-Campus Wi-Fi often blocks phone-to-laptop connections. If the phone can't reach the laptop, use a phone hotspot, or use the hosted version below.
+Campus Wi-Fi often blocks phone-to-laptop connections. If the phone can't reach the laptop, use a phone hotspot, or just open the hosted version at https://e3-navigator.onrender.com.
 
 ### Hosted on Render
 
+Live at **https://e3-navigator.onrender.com** (Render service `e3-navigator`, Blueprint `e3-navigator`).
+
 `render.yaml` (repo root) publishes `web/` as a free Render **static site**. There's no database or server code, so nothing else needs setting up. Render provides HTTPS, so phones can use the camera and sensors.
 
-- **First time:** Render dashboard → **New → Blueprint** → pick this GitHub repo → **Apply**.
+- **First time** (already done for the link above): Render dashboard → **New → Blueprint** → pick this GitHub repo → **Apply**.
 - **After that:** every push to `main` that changes `web/` redeploys automatically (Android-only changes are skipped).
 
 ## 3. Unit tests
