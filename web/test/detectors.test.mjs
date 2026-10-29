@@ -257,7 +257,8 @@ test('geometry follows turns', () => {
 test('the shipped route file parses', () => {
   const r = parseRoute(readFileSync(new URL('../routes/e3_route.json', import.meta.url), 'utf8'));
   assert.equal(r.segments.length, 5);
-  assert.equal(r.segments[1].maxSigmaM, 7);
+  assert.equal(r.segments[1].lengthM, 82);
+  assert.equal(r.segments[1].maxSigmaM, 10);
   assert.equal(r.segments[0].landmarks[0].sightingDistanceM, 0);
 });
 

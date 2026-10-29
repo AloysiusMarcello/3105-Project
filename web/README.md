@@ -32,7 +32,7 @@ A laptop has no motion sensors, so the app switches to the **simulator** (the bu
 | W or ↓ | "Where am I?" (hold 2 s = stop) |
 | Esc | stop navigation (closes the testing tools when they are open) |
 
-**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02, arrives) → Space → → → ↑ ×78 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet) → Space → T → ↑ ×24 → → → ↑ ×71 → → → 1 (navigation complete).
+**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02, arrives) → Space → → → ↑ ×119 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet) → Space → T → ↑ ×24 → → → ↑ ×113 → → → 1 (navigation complete).
 
 ## 2. Run it on a phone
 

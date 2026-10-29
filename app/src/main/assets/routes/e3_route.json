@@ -22,14 +22,15 @@
       "_video": "0:21-1:11. ~8 m to the second E3-06-02 door, then a long corridor with no forward-facing signs until the EXIT sign above the double doors at the end. Turn LEFT at the end (the lift lobby is to the right).",
       "from": "E3-06-02",
       "to": "the end of the corridor",
-      "lengthM": 55.0,
+      "_length": "82 m to the left turn, from the team's measurement (was a 55 m video estimate). maxSigmaM raised from 7 to 10 so 10% drift over 78 m still reaches the EXIT sign.",
+      "lengthM": 82.0,
       "endAction": "TURN_LEFT",
       "startTurn": "RIGHT",
       "startInstruction": "Turn right to face along the corridor, then walk straight. This is a long corridor.",
-      "maxSigmaM": 7.0,
+      "maxSigmaM": 10.0,
       "landmarks": [
         { "_note": "ceiling EXIT sign above the double doors at the corridor end, facing you as you walk",
-          "id": "L2", "text": "EXIT", "positionM": 55.0, "sightingDistanceM": 4.0 }
+          "id": "L2", "text": "EXIT", "positionM": 82.0, "sightingDistanceM": 4.0 }
       ]
     },
     {
@@ -58,14 +59,15 @@
       "_video": "1:55-2:39. Long corridor back towards Cheers (the Cheers sign is visible far ahead). First E3-06-02 door met is on the RIGHT.",
       "from": "the main corridor",
       "to": "E3-06-02",
-      "lengthM": 47.0,
+      "_length": "S2 (82 m) minus the ~8 m between the two E3-06-02 doors.",
+      "lengthM": 74.0,
       "endAction": "ARRIVE",
       "arrivalSide": "RIGHT",
       "startInstruction": "Walk straight back along the long corridor towards E3-06-02.",
       "arrivalMessage": "You are back at tutorial room E3-06-02.",
-      "maxSigmaM": 7.0,
+      "maxSigmaM": 10.0,
       "landmarks": [
-        { "id": "L3", "text": "E3-06-02", "positionM": 47.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
+        { "id": "L3", "text": "E3-06-02", "positionM": 74.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
       ]
     }
   ]
