@@ -74,14 +74,14 @@ function trackingGuidance(route, i, seg, remaining, dest, toDest, tol) {
   }
 }
 
-/** First ARRIVE waypoint at or after segment `from`, and the walking distance to it. */
+/** First ARRIVE waypoint (one that stops, not one passed on the way) at or after segment `from`, and the walking distance to it. */
 export function nextDestination(route, from, remainingInCurrent) {
   let dist = remainingInCurrent;
   const segs = route.segments;
   for (let k = from; k < segs.length; k++) {
     const s = segs[k];
     if (k > from) dist += s.lengthM;
-    if (s.endAction === EndAction.ARRIVE || k === segs.length - 1) return [s.to, dist];
+    if ((s.endAction === EndAction.ARRIVE && !s.continueAutomatically) || k === segs.length - 1) return [s.to, dist];
   }
   return [segs[segs.length - 1].to, dist];
 }

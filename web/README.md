@@ -1,6 +1,6 @@
 # E3 Navigator: browser version
 
-The same hybrid visual-inertial navigator as the Android app (route **Cheers → E3-06-02 → male toilet → back to E3-06-02**), running in a phone's web browser. There's nothing to install on the phone and no Android Studio needed.
+The same hybrid visual-inertial navigator as the Android app (route **Cheers → E3-06-02 → male toilet → back to Cheers**), running in a phone's web browser. There's nothing to install on the phone and no Android Studio needed.
 
 The navigation logic (`NavigationEngine`, turn and step detectors, landmark matcher, guidance) is a line-by-line JavaScript port of the Kotlin `core/` package, with the same thresholds, wording and unit tests. The browser layer replaces the Android APIs: motion sensors, camera with on-device OCR, speech, vibration and logging.
 
@@ -32,7 +32,7 @@ A laptop has no motion sensors, so the app switches to the **simulator** (the bu
 | W or ↓ | "Where am I?" (hold 2 s = stop) |
 | Esc | stop navigation (closes the testing tools when they are open) |
 
-**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02, arrives) → Space → → → ↑ ×119 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet) → Space → T → ↑ ×24 → → → ↑ ×122 → → → 1 (navigation complete).
+**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02 and carries on, no button) → → → ↑ ×89 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet) → Space → T → ↑ ×24 → → → ↑ ×122 (back at Cheers, navigation complete).
 
 ## 2. Run it on a phone
 
@@ -102,10 +102,12 @@ Headset buttons work through the Media Session API: the app plays a silent audio
 | CSV logs in `Android/data/…/logs`, Share log | Same CSV columns, kept in browser storage (last 15 runs); **Share current log** or **Download** in the testing tools |
 | `route.json` copied over USB overrides the route | **Load route.json** in the testing tools (kept in the browser); **Use built-in route** to go back |
 | "Press volume up to continue" | "Press the button when you are ready to continue" |
+| Every waypoint waits for the button | A waypoint with `"continueAutomatically": true` in the route (E3-06-02 on the way out) is announced and passed with no button press; the toilet still waits. The Android app ignores this field and still waits |
+| — | If the phone's speech engine stalls with cues queued, a watchdog restarts it with the newest cue (logged as `tts_stuck`) |
 
 **New in the browser version:** the bottom bar shows the **distance walked** and step count, live, for the current run. It is the sum of the estimated step lengths (so it follows the step calibration and adaptive steps), resets when navigation starts, and stays on screen after the run ends so testers can compare it with the measured route.
 
-Everything else is unchanged: calibration (step length + adaptive Weinberg model), plate-size calibration, survey marks, sensor diagnostic (raw `devicemotion` CSV), the Maps-style screen, the confidence levels and all spoken cues. The route file format is identical: `web/routes/e3_route.json` is a copy of the Android asset, and the main README's survey instructions (§4) apply to it.
+Everything else is unchanged: calibration (step length + adaptive Weinberg model), plate-size calibration, survey marks, sensor diagnostic (raw `devicemotion` CSV), the Maps-style screen, the confidence levels and all spoken cues. The route file format is the same apart from the optional `continueAutomatically` field: `web/routes/e3_route.json` is a copy of the Android asset, and the main README's survey instructions (§4) apply to it.
 
 **Faster OCR on Android:** Chrome's built-in `TextDetector` uses the phone's own text recogniser. It's behind a flag: `chrome://flags` → **Experimental Web Platform features** → Enabled. The app uses it automatically when present (Testing tools → OCR line shows which engine is active).
 

@@ -1,5 +1,5 @@
 {
-  "_note": "Built from the 19 Oct route video. Shape, turn directions, door sides and sign choices come from the video. LENGTHS ARE VIDEO-TIMING ESTIMATES (~1.2 m/s, roughly +/-25%): tape-measure S1, S2, S3 and replace. Fields starting with _ are ignored.",
+  "_note": "Built from the 19 Oct route video, then corrected by the team: the corridor is 80 m from Cheers to the left turn, and the walk back ends at Cheers. S1 and the walkway (S3, S4) are still VIDEO-TIMING ESTIMATES (~1.2 m/s, roughly +/-25%). Fields starting with _ are ignored.",
   "routeId": "E3_ROUTE_01",
   "name": "Cheers to E3-06-02, toilet and back",
   "segments": [
@@ -11,6 +11,8 @@
       "lengthM": 18.0,
       "endAction": "ARRIVE",
       "arrivalSide": "LEFT",
+      "_continue": "Passed on the way to the toilet: announce it and carry on, no button press.",
+      "continueAutomatically": true,
       "startInstruction": "With your back to Cheers, walk straight ahead down the main corridor.",
       "arrivalMessage": "You are at the door of tutorial room E3-06-02.",
       "landmarks": [
@@ -20,17 +22,17 @@
     {
       "id": "S2",
       "_video": "0:21-1:11. ~8 m to the second E3-06-02 door, then a long corridor with no forward-facing signs until the EXIT sign above the double doors at the end. Turn LEFT at the end (the lift lobby is to the right).",
+      "_length": "80 m from Cheers to the left turn (team measurement) minus the 18 m from Cheers to the E3-06-02 door. maxSigmaM 9 leaves room for 10% drift over 62 m without the EXIT sign.",
       "from": "E3-06-02",
       "to": "the end of the corridor",
-      "_length": "82 m to the left turn, from the team's measurement (was a 55 m video estimate). maxSigmaM raised from 7 to 10 so 10% drift over 78 m still reaches the EXIT sign.",
-      "lengthM": 82.0,
+      "lengthM": 62.0,
       "endAction": "TURN_LEFT",
       "startTurn": "RIGHT",
       "startInstruction": "Turn right to face along the corridor, then walk straight. This is a long corridor.",
-      "maxSigmaM": 10.0,
+      "maxSigmaM": 9.0,
       "landmarks": [
         { "_note": "ceiling EXIT sign above the double doors at the corridor end, facing you as you walk",
-          "id": "L2", "text": "EXIT", "positionM": 82.0, "sightingDistanceM": 4.0 }
+          "id": "L2", "text": "EXIT", "positionM": 62.0, "sightingDistanceM": 4.0 }
       ]
     },
     {
@@ -56,18 +58,19 @@
     },
     {
       "id": "S5",
-      "_video": "1:55-2:39. Long corridor back towards Cheers (the Cheers sign is visible far ahead). First E3-06-02 door met is on the RIGHT.",
+      "_video": "1:55-2:39. Long corridor back towards Cheers (the Cheers sign is visible far ahead). Both E3-06-02 doors are on the RIGHT, about 26 m and 18 m before Cheers.",
+      "_length": "80 m from the right turn back to Cheers (team measurement). Arrival at Cheers is by step count; the E3-06-02 plates give a position fix if they happen to be read on the way.",
       "from": "the main corridor",
-      "to": "E3-06-02",
-      "_length": "80 m from the team's measurement (was a 47 m video estimate).",
+      "to": "Cheers",
       "lengthM": 80.0,
       "endAction": "ARRIVE",
-      "arrivalSide": "RIGHT",
-      "startInstruction": "Walk straight back along the long corridor towards E3-06-02.",
-      "arrivalMessage": "You are back at tutorial room E3-06-02.",
+      "startInstruction": "Walk straight back along the long corridor towards Cheers.",
+      "arrivalMessage": "You are back at Cheers.",
       "maxSigmaM": 10.0,
       "landmarks": [
-        { "id": "L3", "text": "E3-06-02", "positionM": 80.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
+        { "id": "L3", "text": "E3-06-02", "positionM": 54.0, "sightingDistanceM": 0.0,
+          "announce": "Passing tutorial room E3-06-02. Keep going straight to Cheers." },
+        { "id": "L4", "text": "E3-06-02", "positionM": 62.0, "sightingDistanceM": 0.0 }
       ]
     }
   ]

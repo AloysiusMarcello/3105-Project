@@ -395,3 +395,32 @@ test('plate size gives a range estimate', () => {
   h.walkTo(11.7);
   assert.equal(h.snap().state, NavState.AWAITING_CONTINUE);
 });
+
+test('a waypoint passed on the way continues without the button', () => {
+  const r = makeRoute('AUTO', 'Pass-through waypoint', [
+    segment('S1', 'Start', 'E3-06-02', 10.0, EndAction.ARRIVE, {
+      arrivalSide: TurnDir.LEFT,
+      continueAutomatically: true,
+      arrivalMessage: 'You are at the door of E3-06-02.',
+      landmarks: [landmark('D1', 'E3-06-02', 10.0, { confirmsArrival: true, sightingDistanceM: 0.0 })],
+    }),
+    segment('S2', 'E3-06-02', 'corner', 20.0, EndAction.TURN_LEFT, {
+      startTurn: TurnDir.RIGHT,
+      startInstruction: 'Turn right to face along the corridor, then walk straight.',
+    }),
+    segment('S3', 'corner', 'Toilet', 5.0, EndAction.ARRIVE),
+  ]);
+  const h = new Harness(r);
+  h.start();
+  h.walkTo(10.0);
+  h.turn(TurnDir.LEFT, -90.0); // faces the door as asked
+  h.see('E3-06-02');
+  assert.equal(h.snap().state, NavState.TRACKING);
+  assert.equal(h.snap().segmentIndex, 1);
+  assert.ok(h.said('You are at the door of E3-06-02'));
+  assert.ok(h.said('Turn right to face along the corridor'));
+  assert.ok(!h.said('Press the button'));
+  assert.ok(h.logs().includes('auto_continue'));
+  h.turn(TurnDir.RIGHT, 90.0);
+  assert.ok(h.said('Good. Walk straight ahead'));
+});

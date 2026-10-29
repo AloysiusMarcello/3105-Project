@@ -6,7 +6,7 @@ import { LandmarkConfirmer, matchesLandmark, matchesText } from '../js/core/land
 import {
   AccelStepDetector, GRAVITY, StepAmplitudeTracker, StepLengthModel, TurnDetector, angleDiff,
 } from '../js/core/detectors.js';
-import { Maneuver, RouteGeometry, buildGuidance } from '../js/core/guidance.js';
+import { Maneuver, RouteGeometry, buildGuidance, nextDestination } from '../js/core/guidance.js';
 import { NavState } from '../js/core/engine.js';
 import { readFileSync } from 'node:fs';
 
@@ -257,9 +257,21 @@ test('geometry follows turns', () => {
 test('the shipped route file parses', () => {
   const r = parseRoute(readFileSync(new URL('../routes/e3_route.json', import.meta.url), 'utf8'));
   assert.equal(r.segments.length, 5);
-  assert.equal(r.segments[1].lengthM, 82);
-  assert.equal(r.segments[1].maxSigmaM, 10);
+  assert.equal(r.segments[0].lengthM + r.segments[1].lengthM, 80); // Cheers to the left turn
+  assert.equal(r.segments[0].continueAutomatically, true);
+  assert.equal(r.segments[1].maxSigmaM, 9);
+  assert.equal(r.segments[4].to, 'Cheers');
+  assert.equal(r.segments[4].lengthM, 80);
   assert.equal(r.segments[0].landmarks[0].sightingDistanceM, 0);
+});
+
+test('the ETA skips waypoints that are passed without stopping', () => {
+  const r = makeRoute('ETA', 'eta', [
+    segment('S1', 'Start', 'Door', 10.0, EndAction.ARRIVE, { continueAutomatically: true }),
+    segment('S2', 'Door', 'Corner', 20.0, EndAction.TURN_LEFT),
+    segment('S3', 'Corner', 'Toilet', 5.0, EndAction.ARRIVE),
+  ]);
+  assert.deepEqual(nextDestination(r, 0, 4.0), ['Toilet', 29.0]);
 });
 
 test('a bad route file gives a readable error', () => {

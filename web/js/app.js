@@ -38,7 +38,10 @@ const params = new URLSearchParams(location.search);
 const settings = new AppSettings();
 const logger = new NavLogger();
 logger.startNew('session');
-const speaker = new Speaker((text, ms) => logger.log('tts_latency', snap(), heading, `ms=${ms} text=${text}`));
+const speaker = new Speaker(
+  (text, ms) => logger.log('tts_latency', snap(), heading, `ms=${ms} text=${text}`),
+  (event, detail) => logger.log(event, snap(), heading, detail),
+);
 speaker.rate = settings.speechRate;
 const haptics = new Haptics();
 const turnDetector = new TurnDetector();

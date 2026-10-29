@@ -1,7 +1,7 @@
 # E3 Navigator: IE3105 G03 Concept C prototype
 
 A native Android app (Kotlin) for hybrid visual-inertial navigation along the predefined E3 route:
-**Cheers → E3-06-02 → male toilet → back to E3-06-02**.
+**Cheers → E3-06-02 → male toilet → back to Cheers**.
 
 - **Motion sensors** count steps and detect turns between landmarks (dead reckoning).
 - **Camera + on-device OCR** reads existing room plates and corrects the accumulated error.

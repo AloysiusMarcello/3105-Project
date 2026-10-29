@@ -40,6 +40,8 @@ export const TurnDir = Object.freeze({ LEFT: 'LEFT', RIGHT: 'RIGHT', AROUND: 'AR
  * @property {string|null} startTurn     a turn to make before walking it (e.g. AROUND for the return leg)
  * @property {string|null} arrivalMessage spoken on arrival when endAction == ARRIVE
  * @property {string|null} arrivalSide   LEFT/RIGHT: side of the destination door
+ * @property {boolean} continueAutomatically  ARRIVE only: a waypoint on the way, so announce it and
+ *                                       carry on with the next segment instead of waiting for the button
  * @property {number|null} maxSigmaM     uncertainty allowed before guidance stops (overrides global)
  * @property {Landmark[]} landmarks
  */
@@ -52,6 +54,7 @@ export function segment(id, from, to, lengthM, endAction, opts = {}) {
     startTurn: opts.startTurn ?? null,
     arrivalMessage: opts.arrivalMessage ?? null,
     arrivalSide: opts.arrivalSide ?? null,
+    continueAutomatically: opts.continueAutomatically ?? false,
     maxSigmaM: opts.maxSigmaM ?? null,
     landmarks: opts.landmarks ?? [],
   };
@@ -114,6 +117,7 @@ export function parseRoute(json) {
         startTurn: s.startTurn ?? null,
         arrivalMessage: s.arrivalMessage ?? null,
         arrivalSide: s.arrivalSide ?? null,
+        continueAutomatically: !!s.continueAutomatically,
         maxSigmaM: s.maxSigmaM ?? null,
         landmarks: (s.landmarks ?? []).map((l) => landmark(
           String(req(l, 'id', where)), String(req(l, 'text', where)), Number(req(l, 'positionM', where)),

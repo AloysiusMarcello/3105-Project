@@ -525,6 +525,11 @@ export class NavigationEngine {
     const message = seg.arrivalMessage ?? `You have arrived at ${seg.to}.`;
     if (this.segIndex === this.route.segments.length - 1) {
       this.finish(message);
+    } else if (seg.continueAutomatically) {
+      // A waypoint on the way rather than a stop: announce it and carry straight on, no button press.
+      this.log('auto_continue', `waypoint=${seg.to}`);
+      this.speak(message);
+      this.beginSegment(this.segIndex + 1, 0, this.carrySigma, 0, true);
     } else {
       this.state = NavState.AWAITING_CONTINUE;
       this.speak(`${message} ${CONTINUE_PROMPT}`);
