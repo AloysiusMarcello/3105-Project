@@ -59,15 +59,15 @@
       "_video": "1:55-2:39. Long corridor back towards Cheers (the Cheers sign is visible far ahead). First E3-06-02 door met is on the RIGHT.",
       "from": "the main corridor",
       "to": "E3-06-02",
-      "_length": "S2 (82 m) minus the ~8 m between the two E3-06-02 doors.",
-      "lengthM": 74.0,
+      "_length": "80 m from the team's measurement (was a 47 m video estimate).",
+      "lengthM": 80.0,
       "endAction": "ARRIVE",
       "arrivalSide": "RIGHT",
       "startInstruction": "Walk straight back along the long corridor towards E3-06-02.",
       "arrivalMessage": "You are back at tutorial room E3-06-02.",
       "maxSigmaM": 10.0,
       "landmarks": [
-        { "id": "L3", "text": "E3-06-02", "positionM": 74.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
+        { "id": "L3", "text": "E3-06-02", "positionM": 80.0, "confirmsArrival": true, "sightingDistanceM": 0.0 }
       ]
     }
   ]
