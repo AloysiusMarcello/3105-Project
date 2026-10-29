@@ -43,6 +43,8 @@
       "lengthM": 16.0,
       "endAction": "ARRIVE",
       "arrivalSide": "LEFT",
+      "_continue": "Team choice: announce the toilet and go straight on to the way back, no button press.",
+      "continueAutomatically": true,
       "startInstruction": "Walk straight along the narrow walkway. The toilet is on your left near the end.",
       "arrivalMessage": "You have arrived at the male toilet. The door is on your left."
     },

@@ -258,7 +258,8 @@ test('the shipped route file parses', () => {
   const r = parseRoute(readFileSync(new URL('../routes/e3_route.json', import.meta.url), 'utf8'));
   assert.equal(r.segments.length, 5);
   assert.equal(r.segments[0].lengthM + r.segments[1].lengthM, 80); // Cheers to the left turn
-  assert.equal(r.segments[0].continueAutomatically, true);
+  assert.equal(r.segments[0].continueAutomatically, true); // E3-06-02
+  assert.equal(r.segments[2].continueAutomatically, true); // male toilet
   assert.equal(r.segments[1].maxSigmaM, 9);
   assert.equal(r.segments[4].to, 'Cheers');
   assert.equal(r.segments[4].lengthM, 80);

@@ -32,7 +32,7 @@ A laptop has no motion sensors, so the app switches to the **simulator** (the bu
 | W or ↓ | "Where am I?" (hold 2 s = stop) |
 | Esc | stop navigation (closes the testing tools when they are open) |
 
-**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02 and carries on, no button) → → → ↑ ×89 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet) → Space → T → ↑ ×24 → → → ↑ ×122 (back at Cheers, navigation complete).
+**A full walk of the built-in route:** ↑ ×27 → ← → 1 (reads E3-06-02 and carries on, no button) → → → ↑ ×89 → 2 (EXIT sign) → ↑ ×6 → ← → ↑ ×24 (toilet, carries on) → T → ↑ ×24 → → → ↑ ×122 (back at Cheers, navigation complete).
 
 ## 2. Run it on a phone
 
@@ -102,7 +102,7 @@ Headset buttons work through the Media Session API: the app plays a silent audio
 | CSV logs in `Android/data/…/logs`, Share log | Same CSV columns, kept in browser storage (last 15 runs); **Share current log** or **Download** in the testing tools |
 | `route.json` copied over USB overrides the route | **Load route.json** in the testing tools (kept in the browser); **Use built-in route** to go back |
 | "Press volume up to continue" | "Press the button when you are ready to continue" |
-| Every waypoint waits for the button | A waypoint with `"continueAutomatically": true` in the route (E3-06-02 on the way out) is announced and passed with no button press; the toilet still waits. The Android app ignores this field and still waits |
+| Every waypoint waits for the button | A waypoint with `"continueAutomatically": true` in the route (E3-06-02 and the male toilet) is announced and the next instruction follows straight away, with no button press. The Android app ignores this field and still waits |
 | — | If the phone's speech engine stalls with cues queued, a watchdog restarts it with the newest cue (logged as `tts_stuck`) |
 
 **New in the browser version:** the bottom bar shows the **distance walked** and step count, live, for the current run. It is the sum of the estimated step lengths (so it follows the step calibration and adaptive steps), resets when navigation starts, and stays on screen after the run ends so testers can compare it with the measured route.
