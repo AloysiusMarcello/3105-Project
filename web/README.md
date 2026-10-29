@@ -104,6 +104,7 @@ Headset buttons work through the Media Session API: the app plays a silent audio
 | "Press volume up to continue" | "Press the button when you are ready to continue" |
 | Every waypoint waits for the button | A waypoint with `"continueAutomatically": true` in the route (E3-06-02 and the male toilet) is announced and the next instruction follows straight away, with no button press. The Android app ignores this field and still waits |
 | — | If the phone's speech engine stalls with cues queued, a watchdog restarts it with the newest cue (logged as `tts_stuck`) |
+| — | If the camera preview pauses or freezes (screen off, app switch, another tab taking the camera), it is resumed or the camera is reopened within ~5 s (`camera_resume` / `camera_restart` in the log; the debug panel's **Camera** line shows the last new image and the restart count). OCR never reads the same frame twice, so a frozen image can't confirm a sign |
 
 **New in the browser version:** the bottom bar shows the **distance walked** and step count, live, for the current run. It is the sum of the estimated step lengths (so it follows the step calibration and adaptive steps), resets when navigation starts, and stays on screen after the run ends so testers can compare it with the measured route.
 

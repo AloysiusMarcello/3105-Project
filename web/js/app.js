@@ -143,7 +143,8 @@ async function arm() {
   scanner = new TextScanner($('preview'), onText, (msg) => {
     logger.log('camera_error', snap(), heading, msg);
     $('statusText').textContent = msg;
-  }, (s) => { cameraStatus = s; $('cameraLabel').textContent = s; updateUi(); });
+  }, (s) => { cameraStatus = s; $('cameraLabel').textContent = s; updateUi(); },
+  (event, detail) => logger.log(event, snap(), heading, detail));
   scanner.start(settings.ocrEngine).then((ok) => {
     logger.log('camera', snap(), heading, `ok=${ok} ocr=${scanner.engineName}`);
     $('cameraLabel').textContent = ok ? scanner.engineName : 'Camera off';
@@ -816,6 +817,9 @@ function debugText(s, now) {
   lines.push(`Heading  ${heading != null ? `${fmt(heading, 0)}°` : '-'} (${simMode ? 'simulator' : motion?.headingSource ?? '-'})`);
   const ocrAge = lastOcrMs === 0 ? '-' : `${Math.floor((now - lastOcrMs) / 1000)}s ago`;
   lines.push(`OCR      ${scanner ? `${scanner.engineName}, ${cameraStatus}` : 'not started'}${scanner?.avgCycleMs ? `, ${Math.round(scanner.avgCycleMs)} ms/frame` : ''}`);
+  if (scanner?.wanted) {
+    lines.push(`Camera   new image ${Math.floor((now - scanner.lastFrameAt) / 1000)}s ago, restarts ${scanner.restarts}`);
+  }
   lines.push(`Read     ${lastOcrText.slice(0, 60)} (${ocrAge})`);
   if (lastMatchText) lines.push(`Plate    ${lastMatchText}  h=${fmt(lastMatchHeight, 4)}`);
   lines.push(`Confirm  2 readings within ${currentConfig().landmarkWindowMs} ms`);

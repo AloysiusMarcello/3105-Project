@@ -8,6 +8,11 @@
  *
  * `onText(observations, rawText, processingMs)` gets every text line found (plus multi-line
  * blocks joined), each with its height as a fraction of the image height for range estimation.
+ *
+ * Phones can pause the preview or stall the camera stream (screen off, app switch, another tab
+ * taking the camera), leaving a frozen frame that OCR would read forever. A watchdog resumes a
+ * paused preview and reopens the camera when the stream ends or stops producing new images;
+ * `onEvent(event, detail)` reports this for the log.
  */
 
 const TESSERACT_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
@@ -15,25 +20,49 @@ const TESSERACT_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tess
 const MIN_INTERVAL_MS = 250;
 /** Frames are scaled down to at most this width before OCR (speed vs. reading small plates). */
 const MAX_OCR_WIDTH = 1280;
+/** Size of the pixel sample used to tell a new frame from a frozen one (sensor noise makes every real frame differ). */
+const SAMPLE_W = 64;
+const SAMPLE_H = 48;
+/** No new image for this long while the page is visible means the stream has stalled. */
+const FROZEN_MS = 5000;
+/** Reopen the camera at most this often. */
+const RESTART_GAP_MS = 15000;
+/** One Tesseract pass taking longer than this means the worker has hung. */
+const OCR_TIMEOUT_MS = 20000;
 
 export class TextScanner {
-  constructor(video, onText, onError, onStatus = () => {}) {
+  constructor(video, onText, onError, onStatus = () => {}, onEvent = () => {}) {
     this.video = video;
     this.onText = onText;
     this.onError = onError;
     this.onStatus = onStatus;
+    this.onEvent = onEvent;
     this.enabled = true;
     this.engineName = 'none';
     this.status = 'off';
     this.stream = null;
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+    const sample = document.createElement('canvas');
+    sample.width = SAMPLE_W;
+    sample.height = SAMPLE_H;
+    this.sampleCtx = sample.getContext('2d', { willReadFrequently: true });
+    this.sampleCtx.imageSmoothingEnabled = false; // keep per-pixel noise; averaging could hide it
     this.running = false;
     this.lastRunMs = 0;
     /** Mean time per OCR cycle, used to widen the landmark confirmation window when OCR is slow. */
     this.avgCycleMs = 0;
     this.worker = null;
     this.detector = null;
+    this.wanted = false;
+    this.restarting = false;
+    this.restarts = 0;
+    this.lastRestartAt = 0;
+    this.frameHash = 0;
+    this.ocrHash = null;
+    /** When the camera last delivered an image that differed from the one before. */
+    this.lastFrameAt = 0;
+    this.watchTimer = null;
   }
 
   setStatus(s) {
@@ -43,18 +72,9 @@ export class TextScanner {
 
   /** @param {'auto'|'tesseract'|'off'} engine */
   async start(engine = 'auto') {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-    } catch (e) {
-      this.setStatus('camera unavailable');
-      this.onError(`Camera failed to start: ${e.message || e.name}`);
-      return false;
-    }
-    this.video.srcObject = this.stream;
-    await this.video.play().catch(() => {});
+    if (!(await this.openCamera())) return false;
+    this.wanted = true;
+    this.watchTimer = setInterval(() => this.watch(), 1000);
     if (engine === 'off') {
       this.setStatus('camera on, OCR off');
       return true;
@@ -65,6 +85,79 @@ export class TextScanner {
       this.loop();
     }
     return true;
+  }
+
+  async openCamera() {
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+    } catch (e) {
+      this.setStatus('camera unavailable');
+      this.onError(`Camera failed to start: ${e.message || e.name}`);
+      return false;
+    }
+    this.stream.getVideoTracks()[0]?.addEventListener('ended', () => this.onEvent('camera_track_ended', ''));
+    this.video.srcObject = this.stream;
+    await this.video.play().catch(() => {});
+    this.lastFrameAt = performance.now();
+    return true;
+  }
+
+  /** Samples the preview and notes when the image last changed. Returns the sample's hash. */
+  sampleFrame() {
+    this.sampleCtx.drawImage(this.video, 0, 0, SAMPLE_W, SAMPLE_H);
+    const d = this.sampleCtx.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data;
+    let h = 0;
+    let max = 0;
+    for (let i = 0; i < d.length; i++) {
+      h = (Math.imul(h, 31) + d[i]) | 0;
+      if ((i & 3) !== 3 && d[i] > max) max = d[i];
+    }
+    // A covered lens gives steady black images: nothing to read, but not a stalled stream.
+    if (h !== this.frameHash || max < 16) {
+      this.frameHash = h;
+      this.lastFrameAt = performance.now();
+    }
+    return h;
+  }
+
+  /** Once a second: keep the preview playing, and reopen the camera if the stream ended or froze. */
+  watch() {
+    const now = performance.now();
+    if (!this.wanted || this.restarting || document.hidden) {
+      this.lastFrameAt = now; // nothing arrives while hidden: restart the clock
+      return;
+    }
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track || track.readyState === 'ended') {
+      if (now - this.lastRestartAt > RESTART_GAP_MS) this.restartCamera('camera stream ended');
+      return;
+    }
+    if (this.video.paused) {
+      this.onEvent('camera_resume', 'preview was paused');
+      this.video.play().catch(() => {});
+      return;
+    }
+    if (this.video.readyState >= 2) this.sampleFrame();
+    const stale = now - this.lastFrameAt;
+    if (stale > FROZEN_MS && now - this.lastRestartAt > RESTART_GAP_MS) {
+      this.restartCamera(`no new image for ${Math.round(stale / 1000)} s`);
+    }
+  }
+
+  async restartCamera(reason) {
+    this.restarting = true;
+    this.restarts++;
+    this.lastRestartAt = performance.now();
+    this.onEvent('camera_restart', reason);
+    this.setStatus('camera restarting…');
+    this.stream?.getTracks().forEach((t) => t.stop());
+    this.stream = null;
+    const ok = await this.openCamera();
+    this.restarting = false;
+    if (ok) this.setStatus(this.engineName === 'none' ? 'camera on, OCR off' : 'ready');
   }
 
   async initOcr(engine) {
@@ -105,10 +198,17 @@ export class TextScanner {
       const wait = MIN_INTERVAL_MS - (performance.now() - this.lastRunMs);
       if (wait > 0) await sleep(wait);
       if (!this.running) break;
-      if (!this.enabled || this.video.readyState < 2 || document.hidden) {
+      if (!this.enabled || this.restarting || this.video.readyState < 2 || document.hidden) {
         await sleep(200);
         continue;
       }
+      // Never read the same image twice: two readings of one frozen frame would wrongly confirm a sign.
+      const hash = this.sampleFrame();
+      if (hash === this.ocrHash) {
+        await sleep(150);
+        continue;
+      }
+      this.ocrHash = hash;
       const t0 = performance.now();
       if (this.lastRunMs) {
         const cycle = t0 - this.lastRunMs;
@@ -120,6 +220,7 @@ export class TextScanner {
         this.onText(observations, raw, performance.now() - t0);
       } catch (e) {
         this.onError(`OCR error: ${e.message || e}`);
+        if (e instanceof OcrTimeout) await this.resetWorker();
         await sleep(1000);
       }
     }
@@ -142,7 +243,7 @@ export class TextScanner {
       this.canvas.height = h;
     }
     this.ctx.drawImage(v, 0, 0, w, h);
-    const { data } = await this.worker.recognize(this.canvas);
+    const { data } = await withTimeout(this.worker.recognize(this.canvas), OCR_TIMEOUT_MS);
     const observations = [];
     for (const block of data.blocks ?? []) {
       const lines = (block.paragraphs ?? []).flatMap((p) => p.lines ?? []);
@@ -158,13 +259,33 @@ export class TextScanner {
     return { observations, raw: data.text ?? '' };
   }
 
+  /** A hung Tesseract worker never answers again: replace it. */
+  async resetWorker() {
+    this.onEvent('ocr_restart', `a pass took over ${OCR_TIMEOUT_MS / 1000} s`);
+    this.worker?.terminate();
+    this.worker = null;
+    await this.initOcr('tesseract');
+  }
+
   stop() {
     this.running = false;
+    this.wanted = false;
+    clearInterval(this.watchTimer);
     this.stream?.getTracks().forEach((t) => t.stop());
     this.stream = null;
     this.worker?.terminate();
     this.worker = null;
   }
+}
+
+class OcrTimeout extends Error {}
+
+function withTimeout(promise, ms) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new OcrTimeout(`OCR took over ${ms / 1000} s`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
