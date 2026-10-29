@@ -162,6 +162,9 @@ button, select, input { font: inherit; }
   font-size: 14px;
   line-height: 1.35;
 }
+/* The Continue row makes the bottom bar 60 px taller. */
+.awaiting-continue .camera-card,
+.awaiting-continue .cue { bottom: calc(164px + var(--safe-bottom)); }
 
 /* ---------------------------------------------------------------- simulator pad */
 
@@ -197,8 +200,9 @@ button, select, input { font: inherit; }
   bottom: 0;
   z-index: 2;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 12px 14px;
   min-height: 92px;
   padding: 14px 16px calc(14px + var(--safe-bottom));
   border-radius: 24px 24px 0 0;
@@ -224,8 +228,18 @@ button, select, input { font: inherit; }
 .eta-time { font-size: 26px; font-weight: 700; color: var(--green); }
 .eta-detail { font-size: 14px; color: var(--muted); white-space: pre-line; }
 
-.pill {
+.walked {
   flex: 0 0 auto;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+  text-align: right;
+}
+.walked-value { font-size: 22px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
+.walked-detail { font-size: 14px; color: var(--muted); white-space: nowrap; }
+
+/* Full-width second row, so the ETA and distance walked keep their room at a waypoint. */
+.pill {
+  flex: 1 0 100%;
   min-height: 48px;
   padding: 0 24px;
   border: 0;

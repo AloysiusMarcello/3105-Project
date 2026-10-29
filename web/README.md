@@ -103,6 +103,8 @@ Headset buttons work through the Media Session API: the app plays a silent audio
 | `route.json` copied over USB overrides the route | **Load route.json** in the testing tools (kept in the browser); **Use built-in route** to go back |
 | "Press volume up to continue" | "Press the button when you are ready to continue" |
 
+**New in the browser version:** the bottom bar shows the **distance walked** and step count, live, for the current run. It is the sum of the estimated step lengths (so it follows the step calibration and adaptive steps), resets when navigation starts, and stays on screen after the run ends so testers can compare it with the measured route.
+
 Everything else is unchanged: calibration (step length + adaptive Weinberg model), plate-size calibration, survey marks, sensor diagnostic (raw `devicemotion` CSV), the Maps-style screen, the confidence levels and all spoken cues. The route file format is identical: `web/routes/e3_route.json` is a copy of the Android asset, and the main README's survey instructions (§4) apply to it.
 
 **Faster OCR on Android:** Chrome's built-in `TextDetector` uses the phone's own text recogniser. It's behind a flag: `chrome://flags` → **Experimental Web Platform features** → Enabled. The app uses it automatically when present (Testing tools → OCR line shows which engine is active).

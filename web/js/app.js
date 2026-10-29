@@ -63,6 +63,9 @@ let accelStepsSeen = 0;
 let counterDistanceM = 0;
 let lastStepLengthM = 0;
 let lastStepMs = 0;
+// Distance walked in the current (or last) navigation run, shown in the bottom bar
+let walkedM = 0;
+let walkedSteps = 0;
 let calibrating = false;
 let calibSteps = 0;
 const calibAmplitudes = [];
@@ -163,6 +166,11 @@ function onStep(timeMs, amp, source) {
   lastStepLengthM = len;
   counterDistanceM += len;
   if (calibrating) { calibSteps++; calibAmplitudes.push(amp); }
+  if (isNavigating()) {
+    walkedM += len;
+    walkedSteps++;
+    updateWalked();
+  }
   engine?.onStep(timeMs, len);
   logger.log('step', snap(), heading, `source=${source} len=${fmt(len, 3)} amp=${amp != null ? fmt(amp, 3) : '-'}`);
   updateUi();
@@ -242,6 +250,9 @@ function startNavigation() {
   logger.startNew('nav');
   logger.log('config', null, heading, JSON.stringify(e.config).replace(/,/g, ';'));
   e.start(performance.now());
+  walkedM = 0;
+  walkedSteps = 0;
+  updateWalked();
   shieldUnlocked = false;
   keepAwake(true);
   updateUi(true);
@@ -777,6 +788,7 @@ function updateUi(force = false) {
   shield.classList.toggle('dim', settings.dimWhileNavigating);
   $('stopButton').hidden = !navigating;
   $('continueButton').hidden = e?.state !== NavState.AWAITING_CONTINUE;
+  $('app').classList.toggle('awaiting-continue', e?.state === NavState.AWAITING_CONTINUE);
   if (e && route && s) {
     map.update(s);
     updateBanner(route, s);
@@ -835,6 +847,13 @@ function updateBanner(r, s) {
     const hhmm = at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     $('etaDetail').textContent = `${Math.trunc(g.remainingToDestinationM)} m · ${hhmm}\nto ${g.destination}`;
   }
+}
+
+/** Live distance walked (sum of estimated step lengths); stays on screen after the run ends. */
+function updateWalked() {
+  $('walkedBox').hidden = false;
+  $('walkedText').textContent = `${fmt(walkedM, 1)} m`;
+  $('walkedDetail').textContent = `walked · ${walkedSteps} ${walkedSteps === 1 ? 'step' : 'steps'}`;
 }
 
 const distanceLabel = (m) => (m < 1.5 ? 'Now' : `${Math.trunc(m)} m`);
